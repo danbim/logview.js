@@ -1,4 +1,4 @@
-ws-logview
+logview.js
 ==========
 
-A WebSocket-based HTML5 log viewer
+A JavaScript/HTML5-based log viewer.
