@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>logview.js - Benchmark</title>
+	<link type="text/css" rel="stylesheet" href="bootstrap-2.0.3/css/bootstrap.css"/>
+	<script type="text/javascript" src="jquery-1.7.2.js"></script>
+	<script type="text/javascript">
+
+		// ------ TextArea version ------
+
+		function cleanTextArea() {
+
+			var begin = new Date().getTime();
+			$('#TerminalTextArea')[0].value = '';
+			var end = new Date().getTime();
+
+			$('#ResultTextAreaClean').empty();
+			$('#ResultTextAreaClean').append((end - begin) + 'ms');
+		}
+
+		function appendTextArea() {
+			var terminal = $('#TerminalTextArea');
+			var lines = [];
+			for (var i = 0; i < 10000; i++) {
+				lines.push(i);
+				terminal[0].value = lines.join('\n');
+			}
+		}
+
+		function runTextArea() {
+
+			var begin = new Date().getTime();
+			appendTextArea();
+			var end = new Date().getTime();
+
+			$('#ResultTextArea').empty();
+			$('#ResultTextArea').append((end - begin) + 'ms');
+		}
+
+		function appendTextAreaLimited() {
+			var terminal = $('#TerminalTextArea');
+			var lines = [];
+			for (var i = 0; i < 10000; i++) {
+				if (lines.length >= 100) {
+					lines.splice(0, 1);
+				}
+				lines.push(i);
+				terminal[0].value = lines.join('\n');
+			}
+		}
+
+		function runTextAreaLimited() {
+
+			var begin = new Date().getTime();
+			appendTextAreaLimited();
+			var end = new Date().getTime();
+
+			$('#ResultTextAreaLimited').empty();
+			$('#ResultTextAreaLimited').append((end - begin) + 'ms');
+		}
+
+		// ------ DOM version ------
+
+		function cleanDOM() {
+
+			var begin = new Date().getTime();
+			var terminal = $('#TerminalDOM')[0];
+			while (terminal.firstChild) {
+				terminal.removeChild(terminal.firstChild);
+			}
+			var end = new Date().getTime();
+
+			$('#ResultDOMClean').empty();
+			$('#ResultDOMClean').append((end - begin) + 'ms');
+		}
+
+		function appendDOM() {
+
+			var terminal = $('#TerminalDOM')[0];
+
+			// create elements
+			var elements = [];
+			for (var i = 0; i < 10000; i++) {
+				elements.push(document.createTextNode(i));
+				elements.push(document.createElement('br'));
+			}
+
+			// append elements to DOM
+			for (var j = 0; j < elements.length; j++) {
+				terminal.appendChild(elements[j]);
+			}
+		}
+
+		function runDOM() {
+
+			var begin = new Date().getTime();
+			appendDOM();
+			var end = new Date().getTime();
+
+			$('#ResultDOM').empty();
+			$('#ResultDOM').append((end - begin) + 'ms');
+		}
+
+		function appendDOMLimited() {
+			var terminal = $('#TerminalDOM')[0];
+			for (var i = 0; i < 10000; i++) {
+				while (terminal.children.length >= 100) {
+					terminal.removeChild(terminal.firstChild);
+					terminal.removeChild(terminal.firstChild);
+				}
+				terminal.appendChild(document.createTextNode(i));
+				terminal.appendChild(document.createElement('br'));
+			}
+		}
+
+		function runDOMLimited() {
+
+			var begin = new Date().getTime();
+			appendDOMLimited();
+			var end = new Date().getTime();
+
+			$('#ResultDOMLimited').empty();
+			$('#ResultDOMLimited').append((end - begin) + 'ms');
+		}
+
+		// ------ Table version ------
+
+		function cleanTable() {
+
+			var begin = new Date().getTime();
+			var terminal = $('#TerminalTable tbody')[0];
+			while (terminal.firstChild) {
+				terminal.removeChild(terminal.firstChild);
+			}
+			var end = new Date().getTime();
+
+			$('#ResultTableClean').empty();
+			$('#ResultTableClean').append((end - begin) + 'ms');
+		}
+
+		function appendTable() {
+			var tr, td, td2, td3, text, text2, text3, table = $('#TerminalTable tbody')[0];
+			for (var i = 0; i < 10000; i++) {
+				tr = document.createElement('tr');
+				td = document.createElement('td');
+				td2 = document.createElement('td');
+				td3 = document.createElement('td');
+				text = document.createTextNode(i);
+				text2 = document.createTextNode(i);
+				text3 = document.createTextNode(i);
+				td.appendChild(text);
+				td2.appendChild(text2);
+				td3.appendChild(text3);
+				tr.appendChild(td);
+				tr.appendChild(td2);
+				tr.appendChild(td3);
+				table.appendChild(tr);
+			}
+		}
+
+		function runTable() {
+
+			var begin = new Date().getTime();
+			appendTable();
+			var end = new Date().getTime();
+
+			$('#ResultTable').empty();
+			$('#ResultTable').append((end - begin) + 'ms');
+		}
+
+		function appendTableLimited() {
+			var tr, td, td2, td3, text, text2, text3, table = $('#TerminalTable tbody')[0];
+			for (var i = 0; i < 10000; i++) {
+
+				while (table.children.length >= 100) {
+					table.removeChild(table.firstChild);
+				}
+
+				tr = document.createElement('tr');
+				td = document.createElement('td');
+				td2 = document.createElement('td');
+				td3 = document.createElement('td');
+				text = document.createTextNode(i);
+				text2 = document.createTextNode(i);
+				text3 = document.createTextNode(i);
+				td.appendChild(text);
+				td2.appendChild(text2);
+				td3.appendChild(text3);
+				tr.appendChild(td);
+				tr.appendChild(td2);
+				tr.appendChild(td3);
+				table.appendChild(tr);
+			}
+		}
+
+		function runTableLimited() {
+
+			var begin = new Date().getTime();
+			appendTableLimited();
+			var end = new Date().getTime();
+
+			$('#ResultTableLimited').empty();
+			$('#ResultTableLimited').append((end - begin) + 'ms');
+		}
+	</script>
+</head>
+<body>
+
+	<div class="row">
+		<table class="span12">
+			<tbody>
+			<tr>
+				<td class="span2">TextArea</td>
+				<td class="span1"><button onClick="cleanTextArea()" class="btn">Clean</button></td>
+				<td class="span1"><div id="ResultTextAreaClean">--</div></td>
+				<td class="span1"><button onClick="runTextArea()" class="btn btn-primary">Run</button></td>
+				<td class="span1"><div id="ResultTextArea">--</div></td>
+				<td class="span1"><button onClick="runTextAreaLimited()" class="btn btn-success">Run Limited</button></td>
+				<td class="span1"><div id="ResultTextAreaLimited">--</div></td>
+			</tr>
+			<tr>
+				<td>DOM</td>
+				<td><button onClick="cleanDOM()" class="btn">Clean</button></td>
+				<td><div id="ResultDOMClean">--</div></td>
+				<td><button onClick="runDOM()" class="btn btn-primary">Run</button></td>
+				<td><div id="ResultDOM">--</div></td>
+				<td><button onClick="runDOMLimited()" class="btn btn-success">Run Limited</button></td>
+				<td><div id="ResultDOMLimited">--</div></td>
+			</tr>
+			<tr>
+				<td>Table</td>
+				<td><button onClick="cleanTable()" class="btn">Clean</button></td>
+				<td><div id="ResultTableClean">--</div></td>
+				<td><button onClick="runTable()" class="btn btn-primary">Run</button></td>
+				<td><div id="ResultTable">--</div></td>
+				<td><button onClick="runTableLimited()" class="btn btn-success">Run Limited</button></td>
+				<td><div id="ResultTableLimited">--</div></td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<br/>
+	<div class="row">
+		<div class="span12"><textarea id="TerminalTextArea" style="border: 1px solid grey; width:100%; height: 200px;"></textarea></div>
+		<div class="span12" id="TerminalDOM" style="border: 1px solid grey; height: 200px; overflow:auto;"></div>
+		<div class="span12" style="border: 1px solid grey;  height: 200px; overflow:auto;"><table id="TerminalTable" cellpadding="5px"><tbody></tbody></table></div>
+	</div>​
+
+</body>
+</html>
