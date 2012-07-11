@@ -1,187 +1,88 @@
-// ------ TextArea version ------
+var LogView = function() {
 
-function cleanTextArea() {
+	this.view = {
+		container : null,
+		menu : {
+			container : null,
+			clearButton : null,
+			maxLinesTextBox : null,
+			lineConverterSelectBox : null
+		},
+		viewer : null
+	};
 
-	var begin = new Date().getTime();
-	$('#TerminalTextArea')[0].value = '';
-	var end = new Date().getTime();
+	this.lineConverters = [];
+	this.lineConverterSelected = null;
+	this.lines = [];
+};
 
-	$('#ResultTextAreaClean').empty();
-	$('#ResultTextAreaClean').append((end - begin) + 'ms');
-}
-
-function appendTextArea() {
-	var terminal = $('#TerminalTextArea');
-	var lines = [];
-	for (var i = 0; i < 10000; i++) {
-		lines.push(i);
-		terminal[0].value = lines.join('\n');
-	}
-}
-
-function runTextArea() {
-
-	var begin = new Date().getTime();
-	appendTextArea();
-	var end = new Date().getTime();
-
-	$('#ResultTextArea').empty();
-	$('#ResultTextArea').append((end - begin) + 'ms');
-}
-
-function appendTextAreaLimited() {
-	var terminal = $('#TerminalTextArea');
-	var lines = [];
-	for (var i = 0; i < 10000; i++) {
-		if (lines.length >= 100) {
-			lines.splice(0, 1);
+LogView.prototype.appendLine = function(line) {
+	this.lines.push(line);
+	var convertedLine = this.lineConverters[this.lineConverterSelected](line);
+	if (convertedLine instanceof Array) {
+		for (var i = 0; i < convertedLine.length; i++) {
+			this.view.viewer.append(convertedLine[i]);
 		}
-		lines.push(i);
-		terminal[0].value = lines.join('\n');
+	} else {
+		this.view.viewer.append(convertedLine);
 	}
-}
+};
 
-function runTextAreaLimited() {
+LogView.prototype.setMaxLines = function(maxLines) {
+	// TODO implement
+};
 
-	var begin = new Date().getTime();
-	appendTextAreaLimited();
-	var end = new Date().getTime();
-
-	$('#ResultTextAreaLimited').empty();
-	$('#ResultTextAreaLimited').append((end - begin) + 'ms');
-}
-
-// ------ DOM version ------
-
-function cleanDOM() {
-
-	var begin = new Date().getTime();
-	var terminal = $('#TerminalDOM')[0];
-	while (terminal.firstChild) {
-		terminal.removeChild(terminal.firstChild);
+LogView.prototype.clear = function() {
+	this.lines = [];
+	while (this.view.viewer[0].firstChild) {
+		this.view.viewer[0].removeChild(this.view.viewer[0].firstChild);
 	}
-	var end = new Date().getTime();
+};
 
-	$('#ResultDOMClean').empty();
-	$('#ResultDOMClean').append((end - begin) + 'ms');
-}
+LogView.prototype.getLineConverters = function() {
+	return this.lineConverters;
+};
 
-function appendDOM() {
-	var terminal = $('#TerminalDOM')[0];
-	for (var i = 0; i < 10000; i++) {
-		terminal.appendChild(document.createTextNode(i));
-		terminal.appendChild(document.createElement('br'));
+LogView.prototype.setLineConverters = function(lineConverters) {
+	this.lineConverters = lineConverters;
+	var keys = Object.keys(lineConverters);
+	var option;
+	for (var i = 0; i < keys.length; i++) {
+		option = document.createElement('option');
+		option.value = keys[i];
+		option.textContent = keys[i];
+		this.view.menu.lineConverterSelectBox.append(option);
 	}
-}
+	this.lineConverterSelected = keys[0];
+};
 
-function runDOM() {
+LogView.prototype.attachTo = function(container) {
 
-	var begin = new Date().getTime();
-	appendDOM();
-	var end = new Date().getTime();
+	var self = this;
 
-	$('#ResultDOM').empty();
-	$('#ResultDOM').append((end - begin) + 'ms');
-}
+	this.view.menu.container = $('<div/>');
+	this.view.menu.container.addClass('LogViewMenu');
 
-function appendDOMLimited() {
-	var terminal = $('#TerminalDOM')[0];
-	for (var i = 0; i < 10000; i++) {
-		while (terminal.children.length >= 100) {
-			terminal.removeChild(terminal.firstChild);
-			terminal.removeChild(terminal.firstChild);
-		}
-		terminal.appendChild(document.createTextNode(i));
-		terminal.appendChild(document.createElement('br'));
-	}
-}
+	this.view.menu.clearButton = $('<button>Clear</button>');
+	this.view.menu.clearButton.addClass('btn');
+	this.view.menu.clearButton.addClass('LogViewMenuClearButton');
+	this.view.menu.clearButton.bind('click', function() {
+		self.clear();
+	});
 
-function runDOMLimited() {
+	this.view.menu.lineConverterSelectBox = $('<select/>');
+	this.view.menu.lineConverterSelectBox.addClass('LogViewLineConverterSelectBox');
+	this.view.menu.lineConverterSelectBox.bind('change', function() {
+		var selectedIndex = self.view.lineConverterSelectBox[0].selectedIndex;
+		self.lineConverterSelected = self.view.lineConverterSelectBox[0].options[selectedIndex].value;
+	});
 
-	var begin = new Date().getTime();
-	appendDOMLimited();
-	var end = new Date().getTime();
+	this.view.menu.container.append(this.view.menu.clearButton);
+	this.view.menu.container.append(this.view.menu.lineConverterSelectBox);
 
-	$('#ResultDOMLimited').empty();
-	$('#ResultDOMLimited').append((end - begin) + 'ms');
-}
+	this.view.viewer = $('<div/>');
+	this.view.viewer.addClass('LogViewViewer');
 
-// ------ Table version ------
-
-function cleanTable() {
-
-	var begin = new Date().getTime();
-	var terminal = $('#TerminalTable tbody')[0];
-	while (terminal.firstChild) {
-		terminal.removeChild(terminal.firstChild);
-	}
-	var end = new Date().getTime();
-
-	$('#ResultTableClean').empty();
-	$('#ResultTableClean').append((end - begin) + 'ms');
-}
-
-function appendTable() {
-	var tr, td, td2, td3, text, text2, text3, table = $('#TerminalTable tbody')[0];
-	for (var i = 0; i < 10000; i++) {
-		tr = document.createElement('tr');
-		td = document.createElement('td');
-		td2 = document.createElement('td');
-		td3 = document.createElement('td');
-		text = document.createTextNode(i);
-		text2 = document.createTextNode(i);
-		text3 = document.createTextNode(i);
-		td.appendChild(text);
-		td2.appendChild(text2);
-		td3.appendChild(text3);
-		tr.appendChild(td);
-		tr.appendChild(td2);
-		tr.appendChild(td3);
-		table.appendChild(tr);
-	}
-}
-
-function runTable() {
-
-	var begin = new Date().getTime();
-	appendTable();
-	var end = new Date().getTime();
-
-	$('#ResultTable').empty();
-	$('#ResultTable').append((end - begin) + 'ms');
-}
-
-function appendTableLimited() {
-	var tr, td, td2, td3, text, text2, text3, table = $('#TerminalTable tbody')[0];
-	for (var i = 0; i < 10000; i++) {
-
-		while (table.children.length >= 100) {
-			table.removeChild(table.firstChild);
-		}
-
-		tr = document.createElement('tr');
-		td = document.createElement('td');
-		td2 = document.createElement('td');
-		td3 = document.createElement('td');
-		text = document.createTextNode(i);
-		text2 = document.createTextNode(i);
-		text3 = document.createTextNode(i);
-		td.appendChild(text);
-		td2.appendChild(text2);
-		td3.appendChild(text3);
-		tr.appendChild(td);
-		tr.appendChild(td2);
-		tr.appendChild(td3);
-		table.appendChild(tr);
-	}
-}
-
-function runTableLimited() {
-
-	var begin = new Date().getTime();
-	appendTableLimited();
-	var end = new Date().getTime();
-
-	$('#ResultTableLimited').empty();
-	$('#ResultTableLimited').append((end - begin) + 'ms');
-}
+	this.view.container = $(container);
+	this.view.container.append(this.view.menu.container, this.view.viewer);
+};

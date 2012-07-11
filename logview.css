@@ -1,0 +1,12 @@
+.LogViewMenu {
+	width: 100%;
+	background-color: #aaaaaa;
+	vertical-align: middle;
+	text-align: right;
+}
+
+.LogViewViewer {
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}

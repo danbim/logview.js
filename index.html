@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>logview.js - Benchmark</title>
+	<link type="text/css" rel="stylesheet" href="bootstrap-2.0.3/css/bootstrap.css"/>
+	<link type="text/css" rel="stylesheet" href="logview.css"/>
+	<style type="text/css">
+		#DivLogView {
+			width: 600px;
+			height: 400px;
+			position: relative;
+			left: 20px;
+			top: 20px;
+		}
+	</style>
+	<script type="text/javascript" src="jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="logview.js"></script>
+	<script type="text/javascript">   dsf
+		$(function() {
+
+			var logView = new LogView();
+			logView.attachTo(document.getElementById('DivLogView'));
+			logView.setLineConverters({
+				'Plain Text' : function(line) {
+					return [
+						document.createTextNode(line.date + ' | ' + line.message),
+						document.createElement('br')
+					];
+				}
+			});
+
+			setInterval(function() {
+				logView.appendLine({
+					message : 'hello, world!',
+					date : new Date().getTime()
+				});
+			}, 1000);
+		});
+	</script>
+</head>
+<body>
+<div id="DivLogView"></div>
+</body>
+</html>
